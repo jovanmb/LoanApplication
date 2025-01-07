@@ -53,4 +53,26 @@
    - Rebuild Solution
 2. Press F5 or the play icon
 3. Make sure that Swagger (Api) and Razor (UI) loads up.
+4. Navigate to Swager (API site) :
+   - Open the Save endpoint (/api/customer/save)
+   - Click the try it out and paste this sample payload and hit execute:
+     - {
+        "firstName": "John",
+        "lastName": "Doe",
+        "dateOfBirth": "1990-01-01",
+        "amountRequired": "5000",
+        "term": "12",
+        "title": "Mr",
+        "email": "john.doe@example.com",
+        "mobile": "0422111333",
+        "product": "ProductA",
+        "monthlyRepayment": null,
+        "totalRepayment": null,
+        "interestAmount": null,
+        "establishmentFee": null
+       }
+     - copy the returned URL ex. (https://localhost:7230/QuoteCalculator/Customer/1)
+5. Navigate to UI application browser and paste the url in the address bar
+6. Quote Calculator should load up the customer information.
+
 
