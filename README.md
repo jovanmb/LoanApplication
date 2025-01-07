@@ -9,7 +9,7 @@
 - Server-side API integration for data retrieval and updates
 - Responsive design with Bootstrap
 
-## Pre-requesit
+## Prerequesites
 - .Net Core 6 and Up
 - Visual Studio 2022 / VS Code
 - Bootstrap (included via CDN)
@@ -27,24 +27,24 @@
 ### LoanApplicatio.API settings:
 1. Install Microsoft.EntityFrameworkCore
 2. Install Microsoft.EntityFrameworkCore.InMemory (we will use In memory database)
-3. Appsettings.json (add the following properties)
-   "Blacklists": {
+3. Appsettings.json (add the following properties):
+    - "Blacklists": {
       "MobileNumbers": [ "0422111333", "0412345678" ],
       "EmailDomains": [ "blacklist.com", "spamdomain.com" ]
-    },
-    "UISettings": {
+   }
+    - "UISettings": {
       "BaseUrl": "https://localhost:7230"
-    },
-    "LoanMinimumDuration": "6",
-    "EstablishmentFee": "300.00",
-    "AnnualRate":  "2.00"
+   }
+    - "LoanMinimumDuration": "6"
+    - "EstablishmentFee": "300.00"
+    - "AnnualRate":  "2.00"
 4. Feel free to modify the values for PMT computation, port of the UI project and for validations)
 
 ### LoanApplication.UI
 1. Set API port and url Appsettings.json properties:
-"ApiSettings": {
-  "BaseUrl": "https://localhost:7089/api/"
-}
+   - "ApiSettings": {
+        "BaseUrl": "https://localhost:7089/api/"
+      }
 
 ### Running application
 1. Open solution LoanApplication.Sln in Visual Studio
