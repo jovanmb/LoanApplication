@@ -1,0 +1,111 @@
+﻿/* Quote Calculator/Result Page Styles */
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+input[type="range"] {
+    width: 100%; /* Make sure the slider takes the full width of its container */
+    padding: 0; /* Remove any padding */
+    margin: 0; /* Remove any margin */
+    border: none; /* Remove any border */
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.range-value {
+    font-weight: bold;
+    margin-top: 5px;
+    text-align: center;
+    color: #555;
+}
+
+.calculate-btn {
+    display: block;
+    width: 100%;
+    background-color: #28a745;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+    .calculate-btn:hover {
+        background-color: #218838;
+    }
+
+.note {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.slider-container {
+    position: relative;
+    width: 100%;
+}
+
+input[type="range"] {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.slider-value {
+    position: absolute;
+    top: -30px; 
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #20c997;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    pointer-events: none;
+}

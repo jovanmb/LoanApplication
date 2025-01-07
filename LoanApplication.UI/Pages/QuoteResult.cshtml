@@ -1,0 +1,376 @@
+﻿@page "/QuoteResult"
+@using System.Text
+@model LoanApplication.UI.Pages.QuoteResultModel
+@{
+    ViewData["Title"] = "Quote Result";
+    Layout = "/Pages/Shared/_LoanAppLayout.cshtml";
+}
+@{
+    var productOptions = new StringBuilder();
+
+    foreach (var product in Enum.GetValues(typeof(LoanApplication.Models.Enums.Product)))
+    {
+        var selected = product.Equals(Model.CustomerRequest.Product) ? "selected" : "";
+        productOptions.AppendLine($"<option value=\"{product}\" {selected}>{product}</option>");
+    }
+}
+
+<div class="quote-summary">
+    <h2>Your quote</h2>
+
+    <div class="customer-details">
+        <h3>Information Details</h3>
+        <p>
+            <strong>Name:</strong> @Model.CustomerRequest.FirstName @Model.CustomerRequest.LastName
+            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editPersonalInfoModal">Edit</button>
+        </p>
+        <p>
+            <strong>Mobile:</strong> @Model.CustomerRequest.Mobile
+        </p>
+        <p>
+            <strong>Email:</strong> @Model.CustomerRequest.Email
+        </p>
+    </div>
+
+    <div class="finance-details">
+        <h3>Finance details</h3>
+        <p>
+            <strong>Finance amount:</strong> @(Model.CustomerRequest.AmountRequired.ToString("C"))
+            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editFinanceInfoModal">Edit</button>
+        </p>
+        <p>
+            <strong>Repayments start from:</strong> @Model.CustomerRequest?.MonthlyRepayment?.ToString("C") over @Model.CustomerRequest?.Term month(s)
+        </p>
+    </div>
+
+    <div class="summary-details">
+        <p><strong>Total repayments:</strong> @(Model.CustomerRequest?.TotalRepayment?.ToString("C") ?? "N")</p>
+        <p><strong>Establishment fee:</strong> @(Model.CustomerRequest?.EstablishmentFee?.ToString("C") ?? "N")</p>
+        <p><strong>Interest:</strong> @(Model.CustomerRequest?.InterestAmount?.ToString("C") ?? "N")</p>
+        <p>The repayment amount is based on the variables selected. Terms and conditions apply.</p>
+    </div>
+
+    <!--hidden fields-->
+    <div id="LoanApplicationFields" style="display:none">
+        <input id="customer-id" type="hidden" value="@Model.CustomerRequest.Id" />
+        <input id="title" type="hidden" value="@Model.CustomerRequest.Title" />
+        <input id="first-name" type="hidden" value="@Model.CustomerRequest.FirstName" />
+        <input id="last-name" type="hidden" value="@Model.CustomerRequest.LastName" />
+        <input id="mobile" type="hidden" value="@Model.CustomerRequest.Mobile" />
+        <input id="email" type="hidden" value="@Model.CustomerRequest.Email" />
+        <input id="term" type="hidden" value="@Model.CustomerRequest.Term" />
+        <input id="product" type="hidden" value="@Model.CustomerRequest.Product" />
+        <input id="monthly-repayment" type="hidden" value="@Model.CustomerRequest.MonthlyRepayment" />
+        <input id="total-repayment" type="hidden" value="@Model.CustomerRequest.TotalRepayment" />
+        <input id="interest-amount" type="hidden" value="@Model.CustomerRequest.InterestAmount" />
+        <input id="establishment-fee" type="hidden" value="@Model.CustomerRequest.EstablishmentFee" />
+        <input id="amount-required" type="hidden" value="@Model.CustomerRequest.AmountRequired" />
+        <input id="date-of-birth" type="hidden" value="@Model.CustomerRequest.DateOfBirth" />
+    </div>
+
+    <button type="button" class="apply-now-btn" onclick="applyNow(this)">Apply Now
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+    </button>
+</div>
+
+<!-- Personal Info Modal -->
+<div class="modal fade" id="editPersonalInfoModal" tabindex="-1" role="dialog" aria-labelledby="editPersonalInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPersonalInfoModalLabel">Edit Personal Information</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="edit-first-name">First Name</label>
+                    <input type="text" class="form-control" id="edit-first-name" value="@Model.CustomerRequest.FirstName">
+                </div>
+                <div class="form-group">
+                    <label for="edit-last-name">Last Name</label>
+                    <input type="text" class="form-control" id="edit-last-name" value="@Model.CustomerRequest.LastName">
+                </div>
+                <div class="form-group">
+                    <label for="edit-mobile">Mobile</label>
+                    <input type="tel" class="form-control" id="edit-mobile" value="@Model.CustomerRequest.Mobile">
+                </div>
+                <div class="form-group">
+                    <label for="edit-email">Email</label>
+                    <input type="email" class="form-control" id="edit-email" value="@Model.CustomerRequest.Email">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="savePersonalInfo(this)">Save changes
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"/>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Finance Info Modal -->
+<div class="modal fade" id="editFinanceInfoModal" tabindex="-1" role="dialog" aria-labelledby="editFinanceInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editFinanceInfoModalLabel">Edit Finance Information</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="edit-product">Product</label>
+                    <select id="edit-product" asp-for="CustomerRequest.Product">
+                        @Html.Raw(productOptions.ToString());
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-amount-required">Finance Amount</label>
+                    <input type="number" required class="form-control" id="edit-amount-required" value="@Model.CustomerRequest.AmountRequired" oninput="updateAmountValue(this.value)">
+                </div>
+                <div class="form-group">
+                    <label for="edit-term">Repayment Period (months)</label>
+                    <input type="number" required class="form-control" id="edit-term" value="@Model.CustomerRequest.Term" oninput="updateTermValue(this.value)">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveFinanceInfo(this)">Save changes
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;" />
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden Forms Section -->
+<div style="display: none;">
+    <form id="updateForm" method="post">
+        <input type="hidden" id="updateType" name="updateType" value="">
+        <button type="submit"></button>
+    </form>
+</div>
+
+<style>
+    .quote-summary {
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+    }
+
+        .quote-summary h2 {
+            text-align: center;
+        }
+
+        .quote-summary h3 {
+            border-bottom-style: dotted;
+        }
+
+    .customer-details, .finance-details, .summary-details {
+        margin-bottom: 20px;
+    }
+
+    .apply-now-btn {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+        .apply-now-btn:hover {
+            background-color: #218838;
+        }
+
+    #loading-indicator {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1050;
+    }
+</style>
+
+<script>
+    const apiBaseUrl = '@ViewData["ApiUrl"]';
+    console.log('API Base URL:', apiBaseUrl);
+
+    function updateAmountValue(value) {
+        value = value.replace(/[^0-9.]/g, '0'); // Remove any non-numeric characters except the period
+        const parts = value.split('.'); // Ensure there's only one period in the value
+        if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
+        if (parts.length === 2) value = parts[0] + '.' + parts[1].substring(0, 2); // Allow only two decimal places
+        document.getElementById('amount-value').innerText = value !== '' ? `${parseFloat(value).toLocaleString()}` : '0';
+    }
+
+    function updateTermValue(value) {
+        value = value.replace(/[^0-9]/g, '0'); // Remove any non-numeric characters
+        document.getElementById('term-value').innerText = value !== '' ? `${value} months` : '0';
+    }
+
+    async function savePersonalInfo(button) {
+        const id = '@Model.CustomerRequest.Id';
+        const firstName = document.getElementById('edit-first-name').value;
+        const lastName = document.getElementById('edit-last-name').value;
+        const mobile = document.getElementById('edit-mobile').value;
+        const email = document.getElementById('edit-email').value;
+        const apiUrl = `${apiBaseUrl}customer/updatePersonalInfo/${id}`;
+
+        // Show the loading spinner and disable the button
+        button.disabled = true;
+        button.querySelector('.spinner-border').style.display = 'inline-block';
+        document.getElementById('editPersonalInfoModal').setAttribute('inert', '');
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ firstName, lastName, mobile, email })
+            });
+
+            if (response.ok) {
+                $('#editPersonalInfoModal').modal('hide'); // Close the modal
+                document.getElementById('updateType').value = 'personalInfo'; // Submit hidden form to update server-side property
+                const formData = new FormData(document.getElementById('updateForm'));
+                const result = await fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                if (result.ok) {
+                    const html = await result.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    document.querySelector('.quote-summary').innerHTML = doc.querySelector('.quote-summary').innerHTML;
+                } else {
+                    location.reload(); // Fallback to full page reload if AJAX update fails
+                }
+            } else {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Error occurred:', error);
+            alert('An error occurred while updating personal information.');
+        } finally {
+            button.disabled = false; // Hide loading spinner and enable button
+            button.querySelector('.spinner-border').style.display = 'none';
+            document.getElementById('editPersonalInfoModal').removeAttribute('inert');
+        }
+    }
+
+    async function saveFinanceInfo(button) {
+        const id = '@Model.CustomerRequest.Id';
+        const amountRequired = document.getElementById('edit-amount-required').value;
+        const term = document.getElementById('edit-term').value;
+        const product = document.getElementById('edit-product').value;
+        const apiUrl = `${apiBaseUrl}customer/updateFinancialInfo/${id}`;
+
+        // Show the loading spinner and disable the button
+        button.disabled = true;
+        button.querySelector('.spinner-border').style.display = 'inline-block';
+        document.getElementById('editFinanceInfoModal').setAttribute('inert', '');
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amountRequired, term, product })
+            });
+
+            if (response.ok) {
+                $('#editFinanceInfoModal').modal('hide'); // Close the modal
+                document.getElementById('updateType').value = 'financeInfo'; // Submit hidden form to update server-side property
+                const formData = new FormData(document.getElementById('updateForm'));
+                const result = await fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                if (result.ok) {
+                    const html = await result.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    document.querySelector('.quote-summary').innerHTML = doc.querySelector('.quote-summary').innerHTML;
+                    
+                } else {
+                    location.reload(); // Fallback to full page reload if AJAX update fails
+                }
+            } else {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Error occurred:', error);
+            alert('An error occurred while updating financial information.');
+        } finally {
+            button.disabled = false; // Hide loading spinner and enable button
+            button.querySelector('.spinner-border').style.display = 'none';
+            document.getElementById('editFinanceInfoModal').removeAttribute('inert');
+        }
+    }
+
+    async function applyNow(button) {
+        const apiUrl = `${apiBaseUrl}customer/apply`;
+        
+        // Show the loading spinner and disable the button
+        button.disabled = true;
+        button.querySelector('.spinner-border').style.display = 'inline-block';
+        
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: parseInt(document.getElementById('customer-id').value),
+                    firstName: document.getElementById('first-name').value,
+                    lastName: document.getElementById('last-name').value,
+                    dateOfBirth: new Date(document.getElementById('date-of-birth').value).toISOString(),
+                    email: document.getElementById('email').value,
+                    mobile: document.getElementById('mobile').value,
+                    amountRequired: parseFloat(document.getElementById('amount-required').value),
+                    term: parseInt(document.getElementById('term').value),
+                    title: document.getElementById('title').value,
+                    product: document.getElementById('product').value,
+                    monthlyRepayment: parseFloat(document.getElementById('monthly-repayment').value),
+                    totalRepayment: parseFloat(document.getElementById('total-repayment').value),
+                    interestAmount: parseFloat(document.getElementById('interest-amount').value),
+                    establishmentFee: parseFloat(document.getElementById('establishment-fee').value)
+                })
+            });
+
+            console.log(response);
+
+            if (response.ok) {
+                location.href = '/ApplicationSuccess';
+            } else {
+                const errorResponse = await response.json(); 
+                // Parse the JSON response 
+                console.log('Server error response:', errorResponse); 
+                // Log the entire response for debugging 
+                alert('Failed to apply for the loan: ' + (errorResponse.message || 'No error message provided'));
+            }
+        } catch (error) {
+            console.error('Error occurred:', error);
+            alert('An error occurred: ' + error);
+        } finally {
+            button.disabled = false; // Hide loading spinner and enable button
+            button.querySelector('.spinner-border').style.display = 'none';
+        }
+    }
+</script>
+

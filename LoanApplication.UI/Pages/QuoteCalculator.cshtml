@@ -1,0 +1,76 @@
+﻿@page "/QuoteCalculator/Customer/{customerId:int}"
+@using System.Text
+@model LoanApplication.UI.Pages.QuoteCalculatorModel
+@{
+    ViewData["Title"] = "Quote Calculator";
+    Layout = "/Pages/Shared/_LoanAppLayout.cshtml";
+}
+<h2>Quote Calculator</h2>
+
+@{
+    var options = new StringBuilder();
+    var titleOptions = new StringBuilder();
+
+    foreach (var product in Enum.GetValues(typeof(LoanApplication.Models.Enums.Product)))
+    {
+        var selected = product.Equals(Model.CustomerRequest.Product) ? "selected" : "";
+        options.AppendLine($"<option value=\"{product}\" {selected}>{product}</option>");
+    }
+
+    foreach (var title in Enum.GetValues(typeof(LoanApplication.Models.Enums.Title)))
+    {
+        var selected = title.Equals(Model.CustomerRequest.Title) ? "selected" : "";
+        titleOptions.AppendLine($"<option value=\"{title}\" {selected}>{title}</option>");
+    }
+}
+
+<form method="post">
+    <div class="form-group">
+        <label for="product">Product</label>
+        <select id="product" asp-for="CustomerRequest.Product">
+            @Html.Raw(options.ToString());
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="amount">How much do you need?</label>
+        <div class="slider-container">
+            <input type="range" id="amount" asp-for="CustomerRequest.AmountRequired" min="2100" max="50000" value="@Model.CustomerRequest.AmountRequired" oninput="updateAmountValue(this.value)">
+            <div class="slider-value" id="amount-value">$@Model.CustomerRequest.AmountRequired</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="term">Loan Term (months)</label>
+        <div class="slider-container">
+            <input type="range" id="term" asp-for="CustomerRequest.Term" min="6" max="60" value="@Model.CustomerRequest.Term" oninput="updateTermValue(this.value)">
+            <div class="slider-value" id="term-value">@Model.CustomerRequest.Term months</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="title">Title</label>
+        <select id="title" name="CustomerRequest.Title">
+            @Html.Raw(titleOptions.ToString())
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="first-name">First name</label>
+        <input type="text" id="first-name" asp-for="CustomerRequest.FirstName" value="@Model.CustomerRequest.FirstName">
+    </div>
+    <div class="form-group">
+        <label for="last-name">Last name</label>
+        <input type="text" id="last-name" asp-for="CustomerRequest.LastName" value="@Model.CustomerRequest.LastName">
+    </div>
+    <div class="form-group">
+        <label for="email">Your email</label>
+        <input type="email" id="email" asp-for="CustomerRequest.Email" value=" @Model.CustomerRequest.Email">
+    </div>
+    <div class="form-group">
+        <label for="mobile-number">Mobile number</label>
+        <input type="tel" id="mobile-number" asp-for="CustomerRequest.Mobile" value="@Model.CustomerRequest.Mobile">
+    </div>
+    <div class="form-group">
+        <label for="dob">Date of Birth</label>
+        <input type="date" id="dob" asp-for="CustomerRequest.DateOfBirth" value="@Model.CustomerRequest.DateOfBirth.ToString("yyyy-MM-dd")">
+    </div>
+    <button type="submit" class="calculate-btn">Calculate quote</button>
+    <div class="note">Quote does not affect your credit score.</div>
+</form>
