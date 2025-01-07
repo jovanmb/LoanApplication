@@ -16,7 +16,7 @@
 - NewtonSoft.Json
 
 ### Installation
-1. Clone the repository.
+1. Clone the repository. (https://github.com/jovanmb/LoanApplication.git)
 2. Open/Navigate to the direcroty
 3. Open the solution LoanApplication.sln
    - Right-click and click properties select Multiple startup projects option and select start for the following:
