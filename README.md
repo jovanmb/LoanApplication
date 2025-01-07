@@ -1,6 +1,6 @@
 # LoanApplication
 
-# This repository contains the Loan Application UI built with ASP.NET Core Razor Pages. The application allows users to calculate loan quotes, update personal and financial information, and apply for loans. 
+### This repository contains the Loan Application UI built with ASP.NET Core Razor Pages. The application allows users to calculate loan quotes, update personal and financial information, and apply for loans. 
 
 ## Features 
 - Calculate loan quotes based on user input
